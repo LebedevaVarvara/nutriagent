@@ -1,30 +1,39 @@
+import math
+
+from agent.models import UserProfile
 from agent.storage import AppState
 
 
 def op_set_profile(state: AppState, args: list[str]) -> str:
-    # Ожидаем: profile пол возраст вес рост активность
     if len(args) != 5:
         raise ValueError("Формат: profile <пол> <возраст> <вес_кг> <рост_см> <активность>")
-    try:
-        sex, age, weight, height, activity = args
-        from agent.models import UserProfile
 
-        profile = UserProfile(
-            sex=sex, age=int(age), weight=float(weight), height=float(height), activity=activity
-        )
-        state.set_profile(profile)
-        n = state.norms
-        return (
-            f"Профиль сохранен!\nВаша норма: {n['calories']} ккал, "
-            f"Б: {n['proteins']}г, Ж: {n['fats']}г, У: {n['carbs']}г. "
-            f"Вода: {n['water']} мл."
-        )
+    sex, age_str, weight_str, height_str, activity = args
+
+    try:
+        age_int = int(age_str)
+        weight_float = float(weight_str)
+        height_float = float(height_str)
     except ValueError:
         raise ValueError("Возраст, вес и рост должны быть числами.") from None
 
+    if not math.isfinite(weight_float) or not math.isfinite(height_float):
+        raise ValueError("Вес и рост должны быть конечными числами.")
+
+    # Модель сама выбросит ошибку с правильным текстом, если пол или активность не те
+    profile = UserProfile(
+        sex=sex, age=age_int, weight=weight_float, height=height_float, activity=activity
+    )
+    state.set_profile(profile)
+    n = state.norms
+    return (
+        f"Профиль сохранен!\nВаша норма: {n['calories']} ккал, "
+        f"Б: {n['proteins']}г, Ж: {n['fats']}г, У: {n['carbs']}г. "
+        f"Вода: {n['water']} мл."
+    )
+
 
 def op_eat(state: AppState, args: list[str]) -> str:
-    # Ожидаем: eat <продукт> <граммы>
     if not state.profile:
         raise ValueError("Сначала настройте профиль командой 'profile'.")
     if len(args) != 2:
@@ -36,9 +45,12 @@ def op_eat(state: AppState, args: list[str]) -> str:
     except ValueError:
         raise ValueError("Граммы должны быть числом.") from None
 
+    if not math.isfinite(grams) or grams <= 0:
+        raise ValueError("Количество грамм должно быть положительным конечным числом.")
+
     if food_name not in state.food_db:
         raise ValueError(
-            f"Продукт '{food_name}' не найден. Доступны: {', '.join(state.food_db.keys())}"
+            f"Продукт '{food_name}' не найден. Доступные: {', '.join(state.food_db.keys())}"
         )
 
     kcal_per_100g = state.food_db[food_name]
@@ -54,7 +66,6 @@ def op_eat(state: AppState, args: list[str]) -> str:
 
 
 def op_water(state: AppState, args: list[str]) -> str:
-    # Ожидаем: water <мл>
     if not state.profile:
         raise ValueError("Сначала настройте профиль командой 'profile'.")
     if len(args) != 1:
@@ -65,6 +76,9 @@ def op_water(state: AppState, args: list[str]) -> str:
     except ValueError:
         raise ValueError("Миллилитры должны быть числом.") from None
 
+    if not math.isfinite(ml) or ml <= 0:
+        raise ValueError("Количество воды должно быть положительным конечным числом.")
+
     state.today_water_ml += ml
     remain = state.norms["water"] - state.today_water_ml
     if remain > 0:
@@ -72,9 +86,7 @@ def op_water(state: AppState, args: list[str]) -> str:
             f"Выпито {int(ml)} мл. Всего: {int(state.today_water_ml)} мл "
             f"из {int(state.norms['water'])} мл. Осталось: {int(remain)} мл."
         )
-    return (
-        f"Выпито {int(ml)} мл. Всего: {int(state.today_water_ml)} мл. Вы выполнили норму воды! 🎉"
-    )
+    return f"Выпито {int(ml)} мл. Всего: {int(state.today_water_ml)} мл. Вы выполнили норму воды!"
 
 
 def op_status(state: AppState, args: list[str]) -> str:

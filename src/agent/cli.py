@@ -48,8 +48,9 @@ def run_agent() -> None:
 
         if cmd == "help":
             print("\nДоступные команды:")
-            for _, usage, desc in commands.items():
-                print(f"  {usage:<40} - {desc}")
+            # ИСПРАВЛЕНИЕ: теперь мы берем значения из словаря и обращаемся к ним по индексу
+            for cmd_info in commands.values():
+                print(f"  {cmd_info[1]:<40} - {cmd_info[2]}")
             print(f"  {'help':<40} - Показать эту справку")
             print(f"  {'exit':<40} - Выйти из программы\n")
             continue

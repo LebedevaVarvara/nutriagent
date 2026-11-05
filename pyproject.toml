@@ -2,7 +2,7 @@
 name = "nutriagent"
 version = "0.2.0"
 description = "Консольный помощник по питанию и водному балансу"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 
 [tool.ruff]
 line-length = 100
