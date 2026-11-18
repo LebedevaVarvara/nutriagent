@@ -18,7 +18,7 @@ class UserProfile:
         valid_sexes = ["м", "муж", "мужской", "ж", "жен", "женский"]
         if self.sex.strip().lower() not in valid_sexes:
             raise ValueError(f"Недопустимый пол: '{self.sex}'. Введите 'м' или 'ж'.")
-        
+
         # 3. И в конце активность
         valid_activities = ["низкая", "средняя", "высокая"]
         if self.activity.strip().lower() not in valid_activities:
@@ -30,7 +30,7 @@ class UserProfile:
 
     def calculate_norms(self) -> dict[str, float]:
         base = (10 * self.weight) + (6.25 * self.height) - (5 * self.age)
-        
+
         is_male = self.sex.strip().lower() in ["м", "муж", "мужской"]
         calories = base + 5 if is_male else base - 161
 
