@@ -21,47 +21,50 @@ def run_agent() -> None:
         "status": (logic.op_status, "status", "Показать прогресс за день"),
     }
 
-    print("🥗 Добро пожаловать в NutriAgent!")
+    print("Добро пожаловать в NutriAgent!")
     print("Введите 'help' для списка команд или 'exit' для выхода.\n")
 
-    while True:
-        try:
-            raw_input = input("nutri> ").strip()
-        except (EOFError, KeyboardInterrupt):
-            print("\nДо встречи!")
-            break
+    try:
+        while True:
+            try:
+                raw_input = input("nutri> ").strip()
+            except (EOFError, KeyboardInterrupt):
+                print("\nДо встречи!")
+                break
 
-        if not raw_input:
-            continue
+            if not raw_input:
+                continue
 
-        try:
-            parts = shlex.split(raw_input)
-        except ValueError:
-            print("Ошибка: неверный формат ввода (проверьте кавычки).")
-            continue
+            try:
+                parts = shlex.split(raw_input)
+            except ValueError:
+                print("Ошибка: неверный формат ввода (проверьте кавычки).")
+                continue
 
-        cmd, args = parts[0].lower(), parts[1:]
+            cmd, args = parts[0].lower(), parts[1:]
 
-        if cmd in ["exit", "quit"]:
-            print("До встречи!")
-            break
+            if cmd in ["exit", "quit"]:
+                print("До встречи!")
+                break
 
-        if cmd == "help":
-            print("\nДоступные команды:")
-            # ИСПРАВЛЕНИЕ: теперь мы берем значения из словаря и обращаемся к ним по индексу
-            for cmd_info in commands.values():
-                print(f"  {cmd_info[1]:<40} - {cmd_info[2]}")
-            print(f"  {'help':<40} - Показать эту справку")
-            print(f"  {'exit':<40} - Выйти из программы\n")
-            continue
+            if cmd == "help":
+                print("\nДоступные команды:")
+                for cmd_info in commands.values():
+                    print(f"  {cmd_info[1]:<40} - {cmd_info[2]}")
+                print(f"  {'help':<40} - Показать эту справку")
+                print(f"  {'exit':<40} - Выйти из программы\n")
+                continue
 
-        if cmd not in commands:
-            print(f"Ошибка: неизвестная команда '{cmd}'. Введите 'help'.")
-            continue
+            if cmd not in commands:
+                print(f"Ошибка: неизвестная команда '{cmd}'. Введите 'help'.")
+                continue
 
-        handler = commands[cmd][0]
-        try:
-            result = handler(state, args)
-            print(result)
-        except ValueError as e:
-            print(f"Ошибка: {e}")
+            handler = commands[cmd][0]
+            try:
+                result = handler(state, args)
+                print(result)
+            except ValueError as e:
+                print(f"Ошибка: {e}")
+    finally:
+        # Сохраняем состояние при любом выходе (exit, Ctrl+C, EOF)
+        state.save()
