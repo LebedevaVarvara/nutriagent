@@ -1,3 +1,5 @@
+#интерфейс
+
 import shlex
 from typing import Callable
 

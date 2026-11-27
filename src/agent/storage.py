@@ -1,3 +1,5 @@
+#держит данные в файле и сохраняет их в файлы 
+
 import json
 from dataclasses import asdict
 from pathlib import Path
@@ -70,7 +72,17 @@ class AppState:
             self.today_water_ml = data.get("today_water_ml", 0.0)
 
         except (OSError, json.JSONDecodeError, TypeError, KeyError) as e:
-            print(f"\n[Ошибка] Файл состояния поврежден ({e}). Начинаем с пустого состояния.")
+            print(f"\n[Ошибка] Файл состояния поврежден ({e}).")
+            print("Создаем резервную копию поврежденного файла и начинаем с пустого состояния.")
+            
+            # Переименовываем сломанный файл, чтобы его не затерло
+            broken_filepath = Path(str(self.filepath) + ".broken")
+            try:
+                if self.filepath.exists():
+                    self.filepath.rename(broken_filepath)
+            except OSError as rename_error:
+                print(f"[Ошибка] Не удалось сохранить резервную копию: {rename_error}")
+
             self.profile = None
             self.norms = {}
             self.today_food_kcal = 0.0

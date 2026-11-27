@@ -1,12 +1,12 @@
-[project]
+[project] #Описание проекта
 name = "nutriagent"
 version = "0.2.0"
 description = "Консольный помощник по питанию и водному балансу"
 requires-python = ">=3.9"
 
-[tool.ruff]
+[tool.ruff] #Настройки линтера
 line-length = 100
 target-version = "py39"
 
-[tool.ruff.lint]
+[tool.ruff.lint] #Правила проверки
 select = ["E", "F", "I", "UP", "B", "SIM"]

@@ -1,3 +1,5 @@
+#проверяет данные и выполняет команды 
+
 import math
 
 from agent.models import UserProfile

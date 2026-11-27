@@ -8,3 +8,5 @@ venv/
 .vscode/
 .DS_Store
 .coverage
+state.json
+test_state.json
