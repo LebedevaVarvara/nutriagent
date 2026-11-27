@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.ruff_cache/
+.idea/
+.vscode/
+.DS_Store
+.coverage
+state.json
+test_state.json
